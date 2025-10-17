@@ -1,0 +1,7 @@
+{
+  "name": "Meet in the Middle",
+  "description": "An application that uses Google Maps and Gemini to find the perfect meeting point between two locations, making it easy for friends to meet up.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
