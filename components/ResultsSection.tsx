@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import type { ResultsState, Ratings, SuggestionIdentifier } from '../types';
 import { LoadingAnimation } from './LoadingAnimation';
 import { SuggestionCard } from './SuggestionCard';
 import { MapModal } from './MapModal';
-import { SearchIcon, MapIcon } from './icons';
+import { SearchIcon, MapIcon, TrophyIcon } from './icons';
 
 interface ResultsSectionProps {
   isLoading: boolean;
@@ -52,6 +53,26 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
   
   const noSuggestionsLeft = results.suggestions.length === 0;
 
+  const numFriends = results.locations.length;
+  
+  const perfectMatchIds = new Set<SuggestionIdentifier>();
+  if (numFriends > 0) {
+      results.suggestions.forEach(suggestion => {
+          const id = `${suggestion.name}-${suggestion.address}`;
+          const currentRatings = ratings[id] || {};
+          const allRatings = Object.values(currentRatings);
+          
+          if (allRatings.length === numFriends && allRatings.every(r => (r as number) === 5)) {
+              perfectMatchIds.add(id);
+          }
+      });
+  }
+
+  const podiumSuggestions = results.suggestions.filter(s => perfectMatchIds.has(`${s.name}-${s.address}`));
+  const otherSuggestions = results.suggestions.filter(s => !perfectMatchIds.has(`${s.name}-${s.address}`));
+
+  const hasPodium = podiumSuggestions.length >= 2;
+
   return (
     <div className="mt-12">
       <div className="text-center">
@@ -69,22 +90,51 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
         </button>
       </div>
       
+      {hasPodium && (
+        <div className="mb-12">
+          <div className="text-center mb-6">
+            <TrophyIcon className="h-12 w-12 text-amber-500 mx-auto mb-2" />
+            <h3 className="text-2xl font-bold text-gray-800">It's a Tie! Your Top Choices</h3>
+            <p className="mt-1 text-gray-600">You all gave these spots a perfect rating!</p>
+          </div>
+          <div className={`grid grid-cols-1 ${podiumSuggestions.length === 2 ? 'md:grid-cols-2' : 'lg:grid-cols-3'} gap-6 max-w-6xl mx-auto`}>
+            {podiumSuggestions.map(suggestion => {
+              const id = `${suggestion.name}-${suggestion.address}`;
+              const originalIndex = results.suggestions.findIndex(s => `${s.name}-${s.address}` === id);
+              return (
+                  <SuggestionCard 
+                    key={id}
+                    suggestion={suggestion}
+                    ratings={ratings}
+                    onRatingChange={onRatingChange}
+                    index={originalIndex}
+                    isRefining={refiningSuggestions.includes(id)}
+                    numFriends={results.locations.length}
+                  />
+              );
+            })}
+          </div>
+          {otherSuggestions.length > 0 && <hr className="my-12 border-t-2 border-dashed border-purple-200" />}
+        </div>
+      )}
+      
       <div className="max-w-3xl mx-auto space-y-6">
-          {noSuggestionsLeft && (
+          {noSuggestionsLeft && !hasPodium && (
              <div className="p-6 text-center bg-purple-50 text-purple-700 rounded-2xl">
                 <p className="font-bold text-lg">Looks like we've run out of ideas!</p>
                 <p className="text-sm mt-1">Try a new search with different vibes to find more spots.</p>
             </div>
           )}
-          {results.suggestions.map((suggestion, index) => {
+          {otherSuggestions.map((suggestion) => {
             const id = `${suggestion.name}-${suggestion.address}`;
+            const originalIndex = results.suggestions.findIndex(s => `${s.name}-${s.address}` === id);
             return (
                 <SuggestionCard 
                   key={id}
                   suggestion={suggestion}
                   ratings={ratings}
                   onRatingChange={onRatingChange}
-                  index={index}
+                  index={originalIndex}
                   isRefining={refiningSuggestions.includes(id)}
                   numFriends={results.locations.length}
                 />
