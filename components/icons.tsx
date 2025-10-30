@@ -98,6 +98,20 @@ export const ShoppingBagIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) 
     </svg>
 );
 
+export const BeerIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19.5V8.25a1.5 1.5 0 011.5-1.5h3a1.5 1.5 0 011.5 1.5v11.25m-6 0h6" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11.25h3v5.25h-3" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25c0-2.485 1.515-4.5 3-4.5s3 2.015 3 4.5" />
+    </svg>
+);
+
+export const CocktailIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 11h18M10 11l-2 10h8l-2-10M12 3v8" />
+    </svg>
+);
+
 export const StarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
         <path fillRule="evenodd" d="M10 16.53l-5.224 2.747.998-5.816-4.228-4.122 5.838-.848L10 3l2.616 5.491 5.838.848-4.228 4.122.998 5.816L10 16.53z" clipRule="evenodd" />

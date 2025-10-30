@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
     UserIcon, UsersIcon, SearchIcon, MyLocationIcon, XMarkIcon, PlusCircleIcon,
-    SparklesIcon, BoltIcon, PaintBrushIcon, FaceSmileIcon, WrenchScrewdriverIcon, ShoppingBagIcon
+    SparklesIcon, BoltIcon, PaintBrushIcon, FaceSmileIcon, WrenchScrewdriverIcon, ShoppingBagIcon,
+    BeerIcon, CocktailIcon
 } from './icons';
 import { getAddressForCoordinates } from '../services/geminiService';
 import type { FriendInput } from '../types';
@@ -15,6 +17,8 @@ const moodCategories = [
     { name: 'Chill & Chat', value: 'a chill spot for conversation like a quiet cafe or lounge', icon: <FaceSmileIcon /> },
     { name: 'Fun & Active', value: 'something fun and active like bowling, mini-golf, or an arcade', icon: <BoltIcon /> },
     { name: 'Foodie Adventure', value: 'a unique or highly-rated restaurant, food truck, or dessert spot', icon: <SparklesIcon /> },
+    { name: 'Beer O\'Clock', value: 'a cool brewery or craft beer bar', icon: <BeerIcon /> },
+    { name: 'Drinks & Nightlife', value: 'a great spot for cocktails, wine, or a fun night out', icon: <CocktailIcon /> },
     { name: 'Creative & Cultured', value: 'an art gallery, museum, or a place with live music', icon: <PaintBrushIcon /> },
     { name: 'Quick & Casual', value: 'a low-key, casual spot like a boba shop or fast-food place', icon: <ShoppingBagIcon /> },
     { name: 'Something Different', value: 'something unique and interesting like an escape room or a local market', icon: <WrenchScrewdriverIcon /> },
@@ -98,7 +102,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onFind, isLoading }) => {
                           <input type="text" id={`location-${friend.id}`} value={friend.location}
                             onChange={(e) => updateFriend(friend.id, 'location', e.target.value)}
                             placeholder="e.g., 1600 Amphitheatre Parkway"
-                            className="block w-full rounded-xl border-gray-300 shadow-sm pl-10 focus:border-purple-500 focus:ring-purple-500 sm:text-sm h-12" required
+                            className="block w-full rounded-xl border-gray-300 bg-white text-black shadow-sm pl-10 focus:border-purple-500 focus:ring-purple-500 sm:text-sm h-12" required
                           />
                         </div>
                         {index === 0 && (
@@ -114,7 +118,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onFind, isLoading }) => {
                         <label className="block text-sm font-bold text-gray-700 mb-2">
                             {index === 0 ? "Your Vibe" : `Friend ${index + 1}'s Vibe`}
                         </label>
-                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             {moodCategories.map((mood) => (
                                 <button key={mood.value} type="button" onClick={() => updateFriend(friend.id, 'vibe', friend.vibe === mood.value ? '' : mood.value)}
                                 className={`flex items-center justify-center p-2 h-16 rounded-xl border text-xs font-bold transition-all duration-200 text-center ${
