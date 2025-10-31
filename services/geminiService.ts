@@ -77,10 +77,16 @@ export const findMeetingSuggestions = async (
         if (friend.vibe) {
             text += ` and wants to do something like "${friend.vibe}".`;
         }
+        if (friend.price) {
+            text += ` Their price preference is for ${friend.price}.`;
+        }
+        if (friend.distance) {
+            text += ` Their travel preference is for ${friend.distance}.`;
+        }
         return text;
     }).join('\n');
 
-    const primaryInstruction = `Your task is to find up to ${count} great meeting points that cleverly combine or satisfy the desires of this group of ${friends.length}.`;
+    const primaryInstruction = `Your task is to find up to ${count} excellent and highly-rated meeting points that cleverly combine or satisfy the desires of this group. Prioritize places that are popular, well-reviewed, unique, or considered local gems. A key requirement is fairness: also prioritize locations that are an even travel distance and time for all friends, but you must also consider each friend's individual travel preference when making suggestions. Avoid suggestions that are very close to one person but very far from another.`;
     
     let exclusionPrompt = "";
     if (exclude.length > 0) {
@@ -91,7 +97,7 @@ export const findMeetingSuggestions = async (
     }
 
     const prompt = `
-    Act as an expert local guide and concierge. A group of ${friends.length} friends want to meet up.
+    Act as an expert local guide and super-concierge with impeccable taste. A group of ${friends.length} friends want to meet up.
     ${friendDetails}
 
     The geographical center of the group is at latitude ${midpoint.lat} and longitude ${midpoint.lng}.
@@ -104,7 +110,10 @@ export const findMeetingSuggestions = async (
     Then, in the 'suggestions' array, provide the list of suggestions. For each suggestion, you must determine if it's a specific 'place' or a timed 'event'.
     
     For each suggestion, provide all of the following details:
-    - type, name, venue, address, lat, lng, description, date (for events only).
+    - type, name, venue, address, lat, lng, date (for events only).
+    - description: In this field, write a compelling sentence or two explaining *why* this is a great choice for this specific group. Mention its highlights, popularity, or what makes it unique to justify your selection.
+    - A 'priceLevel' field with a rating like "$", "$$", "$$$", or "Free" to indicate the cost. This can be null if not applicable.
+    - A 'url' field containing a link to a relevant website for the place or event, such as its official website or a Google Maps link. If a good link isn't available, this can be null.
     - A 'travelInfo' array. This array MUST contain exactly ${friends.length} items, one for each friend in the original order.
     - Each item in 'travelInfo' must have 'distanceFrom' (e.g., "8.4 km") and 'durationFrom' (e.g., "15 mins") from that specific friend's starting location to the suggestion.
     `;
@@ -132,6 +141,8 @@ export const findMeetingSuggestions = async (
                                     lng: { type: Type.NUMBER },
                                     date: { type: Type.STRING, nullable: true },
                                     description: { type: Type.STRING },
+                                    url: { type: Type.STRING, nullable: true },
+                                    priceLevel: { type: Type.STRING, nullable: true },
                                     travelInfo: {
                                         type: Type.ARRAY,
                                         items: {
@@ -159,6 +170,8 @@ export const findMeetingSuggestions = async (
         result.suggestions = result.suggestions.map((s: any) => ({
             ...s,
             date: s.date === null ? undefined : s.date,
+            url: s.url === null ? undefined : s.url,
+            priceLevel: s.priceLevel === null ? undefined : s.priceLevel,
         }));
 
         return result;

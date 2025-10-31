@@ -1,7 +1,7 @@
 
 import React from 'react';
 import type { Suggestion, Ratings, SuggestionIdentifier } from '../types';
-import { UserIcon, UsersIcon, StarIcon, MapPinIcon, ClockIcon, InformationCircleIcon, HeartIcon, TrophyIcon } from './icons';
+import { UserIcon, UsersIcon, StarIcon, MapPinIcon, ClockIcon, InformationCircleIcon, HeartIcon, TrophyIcon, ArrowTopRightOnSquareIcon } from './icons';
 
 interface SuggestionCardProps {
     suggestion: Suggestion;
@@ -92,8 +92,24 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({ suggestion, rati
                 <div className="md:flex md:items-start md:justify-between">
                     <div className="flex-grow pl-10 pr-4">
                         <p className="text-xs font-bold uppercase tracking-wider text-purple-600">{isEvent ? 'Event' : 'Place'}</p>
-                        <h3 className="text-2xl font-bold text-slate-800 mt-1">{suggestion.name}</h3>
-                        <p className="text-sm text-slate-600 mt-1 font-semibold">{suggestion.venue}</p>
+                        <h3 className="text-2xl font-bold text-slate-800 mt-1">
+                            {suggestion.url ? (
+                                <a href={suggestion.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center group hover:text-purple-700 transition-colors duration-200 underline-offset-4 hover:underline">
+                                    {suggestion.name}
+                                    <ArrowTopRightOnSquareIcon className="h-5 w-5 ml-2 text-slate-400 group-hover:text-purple-600 transition-colors duration-200" />
+                                </a>
+                            ) : (
+                                suggestion.name
+                            )}
+                        </h3>
+                        <div className="flex items-baseline gap-x-2 mt-1">
+                            <p className="text-sm text-slate-600 font-semibold">{suggestion.venue}</p>
+                            {suggestion.priceLevel && (
+                                <p className="text-xs font-bold text-purple-700 bg-purple-100 py-0.5 px-1.5 rounded-md">
+                                    {suggestion.priceLevel}
+                                </p>
+                            )}
+                        </div>
                         <p className="flex items-start text-sm text-slate-500 mt-2">
                             <MapPinIcon className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
                             <span>{suggestion.address}</span>

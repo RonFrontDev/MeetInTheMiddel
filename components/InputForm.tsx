@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     UserIcon, UsersIcon, SearchIcon, MyLocationIcon, XMarkIcon, PlusCircleIcon,
     SparklesIcon, BoltIcon, PaintBrushIcon, FaceSmileIcon, WrenchScrewdriverIcon, ShoppingBagIcon,
-    BeerIcon, CocktailIcon
+    BeerIcon, CocktailIcon, CurrencyDollarIcon, ClockIcon
 } from './icons';
 import { getAddressForCoordinates } from '../services/geminiService';
 import type { FriendInput } from '../types';
@@ -24,10 +24,27 @@ const moodCategories = [
     { name: 'Something Different', value: 'something unique and interesting like an escape room or a local market', icon: <WrenchScrewdriverIcon /> },
 ];
 
+const priceCategories = [
+    { name: '$', value: 'cheap or free places' },
+    { name: '$$', value: 'moderately priced places' },
+    { name: '$$$', value: 'splurge-worthy or pricey places' },
+    { name: 'Any', value: '' }, // Empty string value means no preference
+];
+
+const distanceCategories = [
+    { name: 'Short', value: 'a short trip, preferably under 15-20 minutes' },
+    { name: 'Medium', value: 'a medium trip, around 20-40 minutes' },
+    { name: 'Long', value: 'a longer trip, as over 40 minutes is fine' },
+    { name: 'Any', value: '' }, // Empty string value means no preference
+];
+
+
 const createNewFriend = (): FriendInput => ({
     id: crypto.randomUUID(),
     location: '',
     vibe: moodCategories[0].value,
+    price: priceCategories[3].value,
+    distance: distanceCategories[3].value,
 });
 
 export const InputForm: React.FC<InputFormProps> = ({ onFind, isLoading }) => {
@@ -35,7 +52,7 @@ export const InputForm: React.FC<InputFormProps> = ({ onFind, isLoading }) => {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const updateFriend = (id: string, field: 'location' | 'vibe', value: string) => {
+  const updateFriend = (id: string, field: 'location' | 'vibe' | 'price' | 'distance', value: string) => {
     setFriends(friends.map(f => f.id === id ? { ...f, [field]: value } : f));
   };
   
@@ -112,6 +129,52 @@ export const InputForm: React.FC<InputFormProps> = ({ onFind, isLoading }) => {
                               {isGettingLocation ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500"></div> : <MyLocationIcon className="h-6 w-6" />}
                             </button>
                         )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4">
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2 mt-4 flex items-center">
+                                <CurrencyDollarIcon className="h-5 w-5 mr-2 text-gray-400"/>
+                                Price
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {priceCategories.map(price => (
+                                    <button
+                                        key={price.name}
+                                        type="button"
+                                        onClick={() => updateFriend(friend.id, 'price', friend.price === price.value ? priceCategories[3].value : price.value)}
+                                        className={`flex items-center justify-center p-2 h-12 rounded-xl border text-sm font-bold transition-all duration-200 ${
+                                            friend.price === price.value
+                                            ? 'bg-purple-100 text-purple-800 border-purple-300 ring-2 ring-purple-200'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-purple-400'
+                                        }`}
+                                    >
+                                        {price.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                         <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2 mt-4 flex items-center">
+                                <ClockIcon className="h-5 w-5 mr-2 text-gray-400"/>
+                                Travel
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {distanceCategories.map(dist => (
+                                    <button
+                                        key={dist.name}
+                                        type="button"
+                                        onClick={() => updateFriend(friend.id, 'distance', friend.distance === dist.value ? distanceCategories[3].value : dist.value)}
+                                        className={`flex items-center justify-center p-2 h-12 rounded-xl border text-sm font-bold transition-all duration-200 ${
+                                            friend.distance === dist.value
+                                            ? 'bg-purple-100 text-purple-800 border-purple-300 ring-2 ring-purple-200'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-purple-400'
+                                        }`}
+                                    >
+                                        {dist.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                       </div>
                     </div>
                     <div>

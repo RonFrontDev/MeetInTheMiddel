@@ -8,6 +8,8 @@ export interface FriendInput {
   id: string;
   location: string;
   vibe: string;
+  price: string;
+  distance: string;
 }
 
 export interface FriendLocation {
@@ -30,6 +32,8 @@ export interface Suggestion {
   travelInfo: TravelInfo[];
   date?: string;
   description?: string;
+  url?: string;
+  priceLevel?: string;
 }
 
 export type SuggestionIdentifier = string;
