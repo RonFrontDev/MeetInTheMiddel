@@ -74,9 +74,9 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
   const hasPodium = podiumSuggestions.length >= 2;
 
   return (
-    <div className="mt-12">
+    <div className="mt-12 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-800">Here's What I Found For You!</h2>
+        <h2 className="text-3xl font-extrabold text-gray-800 tracking-tight">Here's What I Found For You!</h2>
         <p className="mt-2 text-lg text-gray-600 max-w-3xl mx-auto">{results.summary}</p>
       </div>
 
@@ -94,23 +94,24 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
         <div className="mb-12">
           <div className="text-center mb-6">
             <TrophyIcon className="h-12 w-12 text-amber-500 mx-auto mb-2" />
-            <h3 className="text-2xl font-bold text-gray-800">It's a Tie! Your Top Choices</h3>
-            <p className="mt-1 text-gray-600">You all gave these spots a perfect rating!</p>
+            <h3 className="text-2xl font-bold text-gray-800">You have a tie for the top spot!</h3>
+            <p className="mt-1 text-gray-600">Everyone gave these suggestions a perfect 5-star rating.</p>
           </div>
           <div className={`grid grid-cols-1 ${podiumSuggestions.length === 2 ? 'md:grid-cols-2' : 'lg:grid-cols-3'} gap-6 max-w-6xl mx-auto`}>
-            {podiumSuggestions.map(suggestion => {
+            {podiumSuggestions.map((suggestion, idx) => {
               const id = `${suggestion.name}-${suggestion.address}`;
               const originalIndex = results.suggestions.findIndex(s => `${s.name}-${s.address}` === id);
               return (
-                  <SuggestionCard 
-                    key={id}
-                    suggestion={suggestion}
-                    ratings={ratings}
-                    onRatingChange={onRatingChange}
-                    index={originalIndex}
-                    isRefining={refiningSuggestions.includes(id)}
-                    numFriends={results.locations.length}
-                  />
+                  <div key={id} className="animate-slide-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                    <SuggestionCard 
+                      suggestion={suggestion}
+                      ratings={ratings}
+                      onRatingChange={onRatingChange}
+                      index={originalIndex}
+                      isRefining={refiningSuggestions.includes(id)}
+                      numFriends={results.locations.length}
+                    />
+                  </div>
               );
             })}
           </div>
@@ -125,19 +126,20 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <p className="text-sm mt-1">Try a new search with different vibes to find more spots.</p>
             </div>
           )}
-          {otherSuggestions.map((suggestion) => {
+          {otherSuggestions.map((suggestion, idx) => {
             const id = `${suggestion.name}-${suggestion.address}`;
             const originalIndex = results.suggestions.findIndex(s => `${s.name}-${s.address}` === id);
             return (
-                <SuggestionCard 
-                  key={id}
-                  suggestion={suggestion}
-                  ratings={ratings}
-                  onRatingChange={onRatingChange}
-                  index={originalIndex}
-                  isRefining={refiningSuggestions.includes(id)}
-                  numFriends={results.locations.length}
-                />
+                <div key={id} className="animate-slide-up" style={{ animationDelay: `${(idx + podiumSuggestions.length) * 100}ms` }}>
+                  <SuggestionCard 
+                    suggestion={suggestion}
+                    ratings={ratings}
+                    onRatingChange={onRatingChange}
+                    index={originalIndex}
+                    isRefining={refiningSuggestions.includes(id)}
+                    numFriends={results.locations.length}
+                  />
+                </div>
             );
           })}
       </div>
@@ -151,7 +153,25 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
           Start a New Search
         </button>
       </div>
-
+      
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out forwards;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.5s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
+      
       <MapModal 
         isOpen={isMapModalOpen}
         onClose={() => setMapModalOpen(false)}

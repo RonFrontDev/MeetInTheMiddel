@@ -7,9 +7,12 @@ export interface Coordinates {
 export interface FriendInput {
   id: string;
   location: string;
-  vibe: string;
-  price: string;
   distance: string;
+  vibe: string;
+}
+
+export interface GroupPreferences {
+    price: string;
 }
 
 export interface FriendLocation {
@@ -49,5 +52,6 @@ export interface ResultsState {
     summary: string;
     searchParams: {
       friends: FriendInput[];
+      preferences: GroupPreferences;
     }
 }

@@ -4,7 +4,7 @@ import { Header } from './components/Header';
 import { InputForm } from './components/InputForm';
 import { ResultsSection } from './components/ResultsSection';
 import { getCoordinatesForLocations, findMeetingSuggestions } from './services/geminiService';
-import type { Coordinates, SuggestionIdentifier, Ratings, ResultsState, FriendInput, FriendLocation } from './types';
+import type { Coordinates, SuggestionIdentifier, Ratings, ResultsState, FriendInput, FriendLocation, GroupPreferences } from './types';
 import { MidiBotIcon } from './components/icons';
 
 const App: React.FC = () => {
@@ -65,6 +65,7 @@ const App: React.FC = () => {
             try {
                 const { suggestions: newSuggestions } = await findMeetingSuggestions(
                     results.searchParams.friends,
+                    results.searchParams.preferences,
                     results.midpoint,
                     1,
                     results.suggestions
@@ -99,7 +100,7 @@ const App: React.FC = () => {
     }
   }, [ratings, results]);
 
-  const handleFindMeetingPoint = useCallback(async (friends: FriendInput[]) => {
+  const handleFindMeetingPoint = useCallback(async (friends: FriendInput[], preferences: GroupPreferences) => {
     setIsLoading(true);
     setError(null);
     setResults(null);
@@ -128,7 +129,7 @@ const App: React.FC = () => {
         lng: locationsWithCoords.reduce((sum, loc) => sum + loc.coords.lng, 0) / locationsWithCoords.length,
       };
       
-      const { suggestions, summary } = await findMeetingSuggestions(friends, midpoint);
+      const { suggestions, summary } = await findMeetingSuggestions(friends, preferences, midpoint);
       if (!suggestions || suggestions.length === 0) {
         throw new Error(`Sorry, I couldn't find any spots that match your group's interests. Try being a bit more general!`);
       }
@@ -138,7 +139,7 @@ const App: React.FC = () => {
         midpoint,
         suggestions,
         summary,
-        searchParams: { friends },
+        searchParams: { friends, preferences },
       });
 
     } catch (e: unknown) {
@@ -158,12 +159,12 @@ const App: React.FC = () => {
     <div className="min-h-screen text-slate-800">
       <Header />
       <main className="container mx-auto p-4 md:p-8 max-w-6xl">
-        <div className="bg-white/90 backdrop-blur-sm p-6 md:p-10 rounded-3xl shadow-2xl shadow-purple-200/50 border border-slate-100">
+        <div className="bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-lg shadow-purple-200/30 border border-slate-200/80">
           <div className="text-center mb-8">
-            <MidiBotIcon className="h-20 w-20 text-purple-600 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-gray-800">Hi, I'm Midi!</h2>
+            <MidiBotIcon className="h-24 w-24 text-purple-600 mx-auto mb-4" />
+            <h2 className="text-3xl font-extrabold text-gray-800 tracking-tight">Meet Your Crew in the Middle</h2>
             <p className="text-gray-600 mt-2 text-lg max-w-2xl mx-auto">
-              Ready for an adventure? Tell me where your group is and the vibes you're all going for. I'll find the perfect spot for everyone!
+              Tell me where your friends are and what you're in the mood for. I'll find the perfect spot for everyone to meet up!
             </p>
           </div>
           <InputForm onFind={handleFindMeetingPoint} isLoading={isLoading} />
@@ -178,8 +179,8 @@ const App: React.FC = () => {
           onSearchAgain={handleSearchAgain}
         />
       </main>
-      <footer className="text-center p-4 text-sm text-amber-800/80 mt-8">
-        <p>Powered by Midi, Gemini, and Google Maps</p>
+      <footer className="text-center p-4 text-sm text-slate-500/80 mt-8">
+        <p>Powered by Midi &amp; the Gemini API</p>
       </footer>
     </div>
   );

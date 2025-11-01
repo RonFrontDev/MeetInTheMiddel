@@ -1,5 +1,6 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
-import type { Coordinates, Suggestion, FriendInput } from "../types";
+import type { Coordinates, Suggestion, FriendInput, GroupPreferences } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -67,6 +68,7 @@ export const getCoordinatesForLocations = async (locations: string[]): Promise<(
 
 export const findMeetingSuggestions = async (
     friends: FriendInput[],
+    preferences: GroupPreferences,
     midpoint: Coordinates, 
     count: number = 5,
     exclude: Suggestion[] = []
@@ -74,17 +76,19 @@ export const findMeetingSuggestions = async (
     
     const friendDetails = friends.map((friend, i) => {
         let text = `- Friend ${i + 1} is at: "${friend.location}"`;
-        if (friend.vibe) {
-            text += ` and wants to do something like "${friend.vibe}".`;
-        }
-        if (friend.price) {
-            text += ` Their price preference is for ${friend.price}.`;
-        }
         if (friend.distance) {
             text += ` Their travel preference is for ${friend.distance}.`;
         }
+        if (friend.vibe) {
+            text += ` Their preferred vibe is "${friend.vibe}".`;
+        }
         return text;
     }).join('\n');
+
+    let groupPreferencesPrompt = "The group has no specific price preference.";
+    if (preferences.price) {
+        groupPreferencesPrompt = `The group shares a preference for a ${preferences.price} price point.`;
+    }
 
     const primaryInstruction = `Your task is to find up to ${count} excellent and highly-rated meeting points that cleverly combine or satisfy the desires of this group. Prioritize places that are popular, well-reviewed, unique, or considered local gems. A key requirement is fairness: also prioritize locations that are an even travel distance and time for all friends, but you must also consider each friend's individual travel preference when making suggestions. Avoid suggestions that are very close to one person but very far from another.`;
     
@@ -98,7 +102,11 @@ export const findMeetingSuggestions = async (
 
     const prompt = `
     Act as an expert local guide and super-concierge with impeccable taste. A group of ${friends.length} friends want to meet up.
+    
+    Here are the friends' starting locations and individual preferences:
     ${friendDetails}
+
+    ${groupPreferencesPrompt}
 
     The geographical center of the group is at latitude ${midpoint.lat} and longitude ${midpoint.lng}.
     

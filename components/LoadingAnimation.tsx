@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-// FIX: Corrected import path for icons
 import { MidiBotIcon } from './icons';
 
 const loadingMessages = [
@@ -31,13 +30,14 @@ export const LoadingAnimation: React.FC = () => {
           100% { transform: translateY(0px); }
         }
         @keyframes antenna-blink {
-          0%, 100% { fill: currentColor; }
-          50% { fill: #a855f7; } /* purple-500 */
+          0%, 100% { fill: #a855f7; } /* purple-500 */
+          50% { fill: #ec4899; } /* pink-500 */
         }
         .animate-float {
           animation: float 3s ease-in-out infinite;
         }
-        .animate-antenna-blink circle:first-of-type {
+        .animate-antenna-blink path:nth-of-type(3),
+        .animate-antenna-blink path:nth-of-type(4) {
             animation: antenna-blink 1.5s ease-in-out infinite;
         }
       `}</style>
